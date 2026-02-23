@@ -13,7 +13,7 @@ const {
 
 const fs = require("fs");
 const path = require("path");
-const discordTranscripts = require("discord-html-transcripts");
+//const discordTranscripts = require("discord-html-transcripts");
 
 const client = new Client({
   intents: [
@@ -47,6 +47,30 @@ const client = new Client({
     Partials.User,
   ],
 });
+client.commands = new Collection();
+
+const commandsPath = path.join(__dirname, "commands");
+
+function loadCommands(dir) {
+  const files = fs.readdirSync(dir);
+
+  for (const file of files) {
+    const fullPath = path.join(dir, file);
+    const stat = fs.lstatSync(fullPath);
+
+    if (stat.isDirectory()) {
+      loadCommands(fullPath);
+    } else if (file.endsWith(".js")) {
+      const command = require(fullPath);
+
+      if (command.data) {
+        client.commands.set(command.data.name, command);
+      }
+    }
+  }
+}
+
+loadCommands(commandsPath);
 
 const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs.readdirSync(eventsPath);
