@@ -11,3 +11,9 @@ export const pool = new Pool({
   port: Number(process.env.DB_PORT),
   ssl: { rejectUnauthorized: false }
 });
+
+pool.connect()
+  .then(() => console.log('🟢 Base de datos conectada'))
+  .catch(err => console.error('🔴 Error DB:', err));
+
+module.exports = pool;
